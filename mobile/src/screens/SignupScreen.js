@@ -25,8 +25,8 @@ export default function SignupScreen({ navigation }) {
       Alert.alert('Validation Error', 'Please fill in all required fields');
       return;
     }
-    if (password.length < 6) {
-      Alert.alert('Validation Error', 'Password must be at least 6 characters');
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/.test(password)) {
+      Alert.alert('Validation Error', 'Password must be 8+ characters with uppercase, lowercase, number, and symbol');
       return;
     }
 
@@ -91,7 +91,7 @@ export default function SignupScreen({ navigation }) {
             <Ionicons name="lock-closed-outline" size={20} color="#94a3b8" style={styles.icon} />
             <TextInput
               style={styles.input}
-              placeholder="Minimum 6 characters"
+              placeholder="8+ chars, upper, number, symbol"
               placeholderTextColor="#64748b"
               value={password}
               onChangeText={setPassword}

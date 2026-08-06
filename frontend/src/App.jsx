@@ -5,6 +5,7 @@ import Sidebar from './components/Layout/Sidebar';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import './components/Layout/Layout.css';
@@ -59,6 +60,7 @@ const App = () => {
         <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
         <Route path="/signup" element={<AuthRoute><Signup /></AuthRoute>} />
         <Route path="/forgot-password" element={<AuthRoute><ForgotPassword /></AuthRoute>} />
+        <Route path="/reset-password" element={<AuthRoute><ResetPassword /></AuthRoute>} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     );
