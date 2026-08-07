@@ -6,15 +6,27 @@ import { HiOutlineX, HiOutlineSparkles } from 'react-icons/hi';
 const PRIORITIES = ['low', 'medium', 'high', 'urgent'];
 const CATEGORIES = ['General', 'Work', 'Personal', 'Health', 'Finance', 'Education', 'Shopping', 'Travel'];
 
+const formatToLocalDatetime = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
 const TaskForm = ({ task, onClose, onSaved }) => {
   const isEdit = !!task;
   const [formData, setFormData] = useState({
     title: task?.title || '',
     description: task?.description || '',
-    dueDate: task?.dueDate ? new Date(task.dueDate).toISOString().slice(0, 16) : '',
+    dueDate: formatToLocalDatetime(task?.dueDate),
     priority: task?.priority || 'medium',
     category: task?.category || 'General',
-    reminder: task?.reminder ? new Date(task.reminder).toISOString().slice(0, 16) : '',
+    reminder: formatToLocalDatetime(task?.reminder),
   });
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
@@ -66,8 +78,8 @@ const TaskForm = ({ task, onClose, onSaved }) => {
     try {
       const payload = {
         ...formData,
-        dueDate: formData.dueDate || null,
-        reminder: formData.reminder || null,
+        dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : null,
+        reminder: formData.reminder ? new Date(formData.reminder).toISOString() : null,
       };
 
       if (isEdit) {
