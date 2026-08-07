@@ -4,7 +4,7 @@ import { Platform } from 'react-native';
 
 // Default base URL (Update localhost to computer's IP address when running on physical device)
 // For Android Emulator, 10.0.2.2 points to host machine localhost
-const DEFAULT_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000/api' : 'http://localhost:5000/api';
+const DEFAULT_URL = 'https://smart-task-app-26w1.onrender.com/api';
 
 export const API_BASE_URL = DEFAULT_URL;
 
