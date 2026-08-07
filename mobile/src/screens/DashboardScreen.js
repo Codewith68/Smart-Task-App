@@ -135,6 +135,18 @@ export default function DashboardScreen({ navigation }) {
           <Text style={styles.cardNum}>{stats?.overdueTasks || 0}</Text>
           <Text style={styles.cardLabel}>Overdue</Text>
         </View>
+
+        <View style={[styles.card, { borderLeftColor: '#f59e0b' }]}>
+          <Ionicons name="flame-outline" size={24} color="#f59e0b" />
+          <Text style={styles.cardNum}>{stats?.streakDays || 0}d</Text>
+          <Text style={styles.cardLabel}>Streak</Text>
+        </View>
+
+        <View style={[styles.card, { borderLeftColor: '#10b981' }]}>
+          <Ionicons name="flash-outline" size={24} color="#10b981" />
+          <Text style={styles.cardNum}>{stats?.productivityScore || 0}%</Text>
+          <Text style={styles.cardLabel}>Score</Text>
+        </View>
       </View>
 
       {/* Completion Bar */}

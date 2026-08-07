@@ -20,5 +20,6 @@ router.delete('/:id', taskController.deleteTask);
 
 // Toggle completion
 router.patch('/:id/complete', taskController.toggleComplete);
+router.patch('/:id/subtasks/:subtaskId', taskController.toggleSubtask);
 
 module.exports = router;

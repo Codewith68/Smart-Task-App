@@ -132,6 +132,23 @@ class TaskController {
       next(error);
     }
   }
+
+  /**
+   * PATCH /api/tasks/:id/subtasks/:subtaskId
+   * Toggle subtask completion
+   */
+  async toggleSubtask(req, res, next) {
+    try {
+      const task = await taskService.toggleSubtask(req.params.id, req.user._id, req.params.subtaskId);
+      res.status(200).json({
+        success: true,
+        message: 'Subtask updated',
+        data: task,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new TaskController();

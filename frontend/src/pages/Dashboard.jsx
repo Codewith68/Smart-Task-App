@@ -190,6 +190,26 @@ const Dashboard = () => {
             <span className="stat-label">Overdue</span>
           </div>
         </div>
+
+        <div className="stat-card" style={{ '--accent': '#f59e0b' }}>
+          <div className="stat-icon" style={{ color: '#f59e0b', background: 'rgba(245, 158, 11, 0.15)' }}>
+            🔥
+          </div>
+          <div className="stat-info">
+            <span className="stat-value">{stats?.streakDays || 0}d</span>
+            <span className="stat-label">Productivity Streak</span>
+          </div>
+        </div>
+
+        <div className="stat-card" style={{ '--accent': '#10b981' }}>
+          <div className="stat-icon" style={{ color: '#10b981', background: 'rgba(16, 185, 129, 0.15)' }}>
+            ⚡
+          </div>
+          <div className="stat-info">
+            <span className="stat-value">{stats?.productivityScore || 0}%</span>
+            <span className="stat-label">Productivity Score</span>
+          </div>
+        </div>
       </div>
 
       {/* Completion Rate */}

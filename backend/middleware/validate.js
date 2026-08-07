@@ -106,6 +106,9 @@ const taskRules = [
   body('reminder')
     .optional({ nullable: true })
     .isISO8601().withMessage('Reminder must be a valid date'),
+  body('subtasks')
+    .optional()
+    .isArray().withMessage('Subtasks must be an array'),
 ];
 
 /**
@@ -137,6 +140,9 @@ const taskUpdateRules = [
   body('reminder')
     .optional({ nullable: true })
     .isISO8601().withMessage('Reminder must be a valid date'),
+  body('subtasks')
+    .optional()
+    .isArray().withMessage('Subtasks must be an array'),
 ];
 
 module.exports = {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-import { HiOutlineX, HiOutlineSparkles, HiOutlineCalendar, HiOutlineBell } from 'react-icons/hi';
+import { HiOutlineX, HiOutlineSparkles, HiOutlineCalendar, HiOutlineBell, HiOutlinePlus, HiOutlineTrash } from 'react-icons/hi';
 
 const PRIORITIES = ['low', 'medium', 'high', 'urgent'];
 const CATEGORIES = ['General', 'Work', 'Personal', 'Health', 'Finance', 'Education', 'Shopping', 'Travel'];
@@ -27,7 +27,9 @@ const TaskForm = ({ task, onClose, onSaved }) => {
     priority: task?.priority || 'medium',
     category: task?.category || 'General',
     reminder: formatToLocalDatetime(task?.reminder),
+    subtasks: task?.subtasks || [],
   });
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState(null);
@@ -115,6 +117,22 @@ const TaskForm = ({ task, onClose, onSaved }) => {
     } finally {
       setAiLoading(false);
     }
+  };
+
+  const handleAddSubtask = () => {
+    if (!newSubtaskTitle.trim()) return;
+    setFormData((prev) => ({
+      ...prev,
+      subtasks: [...prev.subtasks, { title: newSubtaskTitle.trim(), completed: false }],
+    }));
+    setNewSubtaskTitle('');
+  };
+
+  const handleRemoveSubtask = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      subtasks: prev.subtasks.filter((_, i) => i !== index),
+    }));
   };
 
   const applySuggestion = (field, value) => {
@@ -242,6 +260,65 @@ const TaskForm = ({ task, onClose, onSaved }) => {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Subtasks / Checklist Section */}
+            <div className="form-group" style={{ marginTop: '0.5rem' }}>
+              <label className="form-label">Subtasks & Checklist</label>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Add a subtask item..."
+                  value={newSubtaskTitle}
+                  onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddSubtask();
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={handleAddSubtask}
+                  style={{ minWidth: '40px' }}
+                >
+                  <HiOutlinePlus size={16} />
+                </button>
+              </div>
+
+              {formData.subtasks.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem', marginTop: '0.5rem' }}>
+                  {formData.subtasks.map((st, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        background: 'var(--bg-tertiary)',
+                        padding: '6px 12px',
+                        borderRadius: '6px',
+                        fontSize: '0.875rem',
+                      }}
+                    >
+                      <span style={{ textDecoration: st.completed ? 'line-through' : 'none', opacity: st.completed ? 0.6 : 1 }}>
+                        {st.title}
+                      </span>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        onClick={() => handleRemoveSubtask(index)}
+                        style={{ color: 'var(--danger)', padding: '2px' }}
+                      >
+                        <HiOutlineTrash size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* AI Suggestions Panel */}

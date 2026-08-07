@@ -67,6 +67,15 @@ export default function TasksScreen({ navigation }) {
     ]);
   };
 
+  const toggleSubtask = async (taskId, subtaskId) => {
+    try {
+      const res = await api.patch(`/tasks/${taskId}/subtasks/${subtaskId}`);
+      setTasks(tasks.map((t) => (t._id === taskId ? res.data.data : t)));
+    } catch (e) {
+      Alert.alert('Error', 'Could not update subtask');
+    }
+  };
+
   const renderTask = ({ item }) => (
     <View style={[styles.taskCard, item.completed && styles.taskCardCompleted]}>
       <TouchableOpacity onPress={() => toggleComplete(item._id)} style={styles.checkBtn}>
@@ -89,6 +98,34 @@ export default function TasksScreen({ navigation }) {
             {item.description}
           </Text>
         ) : null}
+
+        {item.subtasks?.length > 0 && (
+          <View style={{ marginTop: 6, marginBottom: 4 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2 }}>
+              <Text style={{ color: '#94a3b8', fontSize: 11 }}>Subtasks</Text>
+              <Text style={{ color: '#94a3b8', fontSize: 11 }}>
+                {item.subtasks.filter((s) => s.completed).length}/{item.subtasks.length}
+              </Text>
+            </View>
+            {item.subtasks.map((st) => (
+              <TouchableOpacity
+                key={st._id || st.title}
+                style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}
+                onPress={() => toggleSubtask(item._id, st._id)}
+              >
+                <Ionicons
+                  name={st.completed ? 'checkbox' : 'square-outline'}
+                  size={14}
+                  color={st.completed ? '#6366f1' : '#64748b'}
+                  style={{ marginRight: 4 }}
+                />
+                <Text style={{ color: st.completed ? '#64748b' : '#cbd5e1', fontSize: 12, textDecorationLine: st.completed ? 'line-through' : 'none' }}>
+                  {st.title}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
         <View style={styles.tagRow}>
           <View style={[styles.tag, { backgroundColor: getPriorityColor(item.priority) }]}>

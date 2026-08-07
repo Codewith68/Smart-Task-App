@@ -124,6 +124,20 @@ class TaskRepository {
   }
 
   /**
+   * Toggle subtask completion status
+   */
+  async toggleSubtask(taskId, userId, subtaskId) {
+    const task = await Task.findOne({ _id: taskId, user: userId });
+    if (!task) return null;
+
+    const subtask = task.subtasks.id(subtaskId);
+    if (!subtask) return null;
+
+    subtask.completed = !subtask.completed;
+    return await task.save();
+  }
+
+  /**
    * Get dashboard statistics for a user
    */
   async getStats(userId) {
@@ -199,13 +213,19 @@ class TaskRepository {
       { $sort: { _id: 1 } },
     ]);
 
+    const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+    const productivityScore = Math.max(0, Math.min(100, Math.round(completionRate * 0.8 + (completedTasks > 0 ? 20 : 0) - (overdueTasks * 5))));
+    const streakDays = completionTrend.length > 0 ? completionTrend.length : (completedTasks > 0 ? 1 : 0);
+
     return {
       totalTasks,
       completedTasks,
       pendingTasks,
       overdueTasks,
       todayTasks,
-      completionRate: totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0,
+      completionRate,
+      productivityScore,
+      streakDays,
       priorityStats: priorityStats.reduce((acc, item) => {
         acc[item._id] = item.count;
         return acc;

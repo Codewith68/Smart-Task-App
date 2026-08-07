@@ -20,6 +20,7 @@ import {
   HiOutlineViewList,
   HiOutlineX,
   HiOutlineClipboardList,
+  HiOutlineDownload,
 } from 'react-icons/hi';
 import TaskForm from '../components/TaskForm';
 import './Tasks.css';
@@ -137,6 +138,37 @@ const Tasks = () => {
     setOrder('desc');
   };
 
+  const handleToggleSubtask = async (taskId, subtaskId) => {
+    try {
+      const res = await api.patch(`/tasks/${taskId}/subtasks/${subtaskId}`);
+      setTasks(tasks.map((t) => (t._id === taskId ? res.data.data : t)));
+    } catch {
+      toast.error('Failed to update subtask');
+    }
+  };
+
+  const exportToCSV = () => {
+    if (tasks.length === 0) return toast.error('No tasks to export');
+    const headers = ['Title', 'Description', 'Priority', 'Category', 'Completed', 'Due Date'];
+    const rows = tasks.map((t) => [
+      `"${t.title.replace(/"/g, '""')}"`,
+      `"${(t.description || '').replace(/"/g, '""')}"`,
+      t.priority,
+      t.category,
+      t.completed ? 'Yes' : 'No',
+      t.dueDate ? format(new Date(t.dueDate), 'yyyy-MM-dd HH:mm') : '',
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `tasks_export_${format(new Date(), 'yyyyMMdd')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Tasks exported as CSV!');
+  };
+
   const hasFilters = search || priority || category || completed;
 
   return (
@@ -147,10 +179,16 @@ const Tasks = () => {
           <h1>Tasks</h1>
           <p>{pagination.total} task{pagination.total !== 1 ? 's' : ''} total</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
-          <HiOutlinePlus size={18} />
-          New Task
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button className="btn btn-secondary" onClick={exportToCSV} title="Export tasks to CSV">
+            <HiOutlineDownload size={18} />
+            Export CSV
+          </button>
+          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
+            <HiOutlinePlus size={18} />
+            New Task
+          </button>
+        </div>
       </div>
 
       {/* Search & Filter Bar */}
@@ -333,6 +371,52 @@ const Tasks = () => {
 
               {task.description && (
                 <p className="task-desc">{task.description}</p>
+              )}
+
+              {/* Subtasks Checklist & Progress Bar */}
+              {task.subtasks?.length > 0 && (
+                <div style={{ marginTop: '0.75rem', marginBottom: '0.5rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBottom: '0.25rem' }}>
+                    <span>Checklist</span>
+                    <span>{task.subtasks.filter(s => s.completed).length}/{task.subtasks.length}</span>
+                  </div>
+                  <div style={{ width: '100%', height: '4px', background: 'var(--bg-tertiary)', borderRadius: '2px', overflow: 'hidden', marginBottom: '0.5rem' }}>
+                    <div
+                      style={{
+                        width: `${(task.subtasks.filter(s => s.completed).length / task.subtasks.length) * 100}%`,
+                        height: '100%',
+                        background: 'linear-gradient(90deg, #6366f1, #10b981)',
+                        transition: 'width 0.3s ease',
+                      }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                    {task.subtasks.map((st) => (
+                      <div
+                        key={st._id || st.title}
+                        onClick={() => handleToggleSubtask(task._id, st._id)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.375rem',
+                          fontSize: '0.75rem',
+                          color: st.completed ? 'var(--text-tertiary)' : 'var(--text-secondary)',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={st.completed}
+                          onChange={() => {}}
+                          style={{ cursor: 'pointer', accentColor: 'var(--primary-500)' }}
+                        />
+                        <span style={{ textDecoration: st.completed ? 'line-through' : 'none' }}>
+                          {st.title}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
 
               <div className="task-footer">

@@ -84,6 +84,19 @@ class TaskService {
   }
 
   /**
+   * Toggle subtask completion
+   */
+  async toggleSubtask(taskId, userId, subtaskId) {
+    const task = await taskRepository.toggleSubtask(taskId, userId, subtaskId);
+    if (!task) {
+      const error = new Error('Subtask or task not found');
+      error.statusCode = 404;
+      throw error;
+    }
+    return task;
+  }
+
+  /**
    * Get dashboard statistics
    */
   async getDashboardStats(userId) {

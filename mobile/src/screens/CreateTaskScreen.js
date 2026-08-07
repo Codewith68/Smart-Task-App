@@ -23,8 +23,20 @@ export default function CreateTaskScreen({ navigation, route }) {
   const [description, setDescription] = useState(taskToEdit?.description || '');
   const [priority, setPriority] = useState(taskToEdit?.priority || 'medium');
   const [category, setCategory] = useState(taskToEdit?.category || 'General');
+  const [subtasks, setSubtasks] = useState(taskToEdit?.subtasks || []);
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+
+  const handleAddSubtask = () => {
+    if (!newSubtaskTitle.trim()) return;
+    setSubtasks([...subtasks, { title: newSubtaskTitle.trim(), completed: false }]);
+    setNewSubtaskTitle('');
+  };
+
+  const handleRemoveSubtask = (index) => {
+    setSubtasks(subtasks.filter((_, i) => i !== index));
+  };
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -39,6 +51,7 @@ export default function CreateTaskScreen({ navigation, route }) {
         description: description.trim(),
         priority,
         category,
+        subtasks,
       };
 
       if (isEdit) {
@@ -149,6 +162,49 @@ export default function CreateTaskScreen({ navigation, route }) {
             </TouchableOpacity>
           ))}
         </View>
+      </View>
+
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>Subtasks & Checklist</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TextInput
+            style={[styles.input, { flex: 1, marginRight: 8 }]}
+            placeholder="Add subtask item..."
+            placeholderTextColor="#64748b"
+            value={newSubtaskTitle}
+            onChangeText={setNewSubtaskTitle}
+          />
+          <TouchableOpacity style={[styles.aiBtn, { backgroundColor: '#6366f1' }]} onPress={handleAddSubtask}>
+            <Ionicons name="add" size={20} color="#ffffff" />
+          </TouchableOpacity>
+        </View>
+
+        {subtasks.length > 0 && (
+          <View style={{ marginTop: 8 }}>
+            {subtasks.map((st, index) => (
+              <View
+                key={index}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  backgroundColor: '#16213e',
+                  borderRadius: 8,
+                  paddingHorizontal: 12,
+                  paddingVertical: 8,
+                  marginBottom: 6,
+                }}
+              >
+                <Text style={{ color: '#f1f5f9', fontSize: 13, textDecorationLine: st.completed ? 'line-through' : 'none' }}>
+                  {st.title}
+                </Text>
+                <TouchableOpacity onPress={() => handleRemoveSubtask(index)}>
+                  <Ionicons name="trash-outline" size={16} color="#ef4444" />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
 
       <TouchableOpacity style={styles.submitBtn} onPress={handleSave} disabled={loading}>
