@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-import { HiOutlineX, HiOutlineSparkles } from 'react-icons/hi';
+import { HiOutlineX, HiOutlineSparkles, HiOutlineCalendar, HiOutlineBell } from 'react-icons/hi';
 
 const PRIORITIES = ['low', 'medium', 'high', 'urgent'];
 const CATEGORIES = ['General', 'Work', 'Personal', 'Health', 'Finance', 'Education', 'Shopping', 'Travel'];
@@ -215,24 +215,32 @@ const TaskForm = ({ task, onClose, onSaved }) => {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div className="form-group">
                 <label className="form-label">Due Date</label>
-                <input
-                  id="task-due-date"
-                  type="datetime-local"
-                  className="form-input"
-                  value={formData.dueDate}
-                  onChange={(e) => handleChange('dueDate', e.target.value)}
-                />
+                <div className="input-icon-wrapper">
+                  <HiOutlineCalendar className="input-icon" size={18} />
+                  <input
+                    id="task-due-date"
+                    type="datetime-local"
+                    className="form-input input-with-icon"
+                    value={formData.dueDate}
+                    onChange={(e) => handleChange('dueDate', e.target.value)}
+                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                  />
+                </div>
               </div>
 
               <div className="form-group">
                 <label className="form-label">Reminder</label>
-                <input
-                  id="task-reminder"
-                  type="datetime-local"
-                  className="form-input"
-                  value={formData.reminder}
-                  onChange={(e) => handleChange('reminder', e.target.value)}
-                />
+                <div className="input-icon-wrapper">
+                  <HiOutlineBell className="input-icon" size={18} />
+                  <input
+                    id="task-reminder"
+                    type="datetime-local"
+                    className="form-input input-with-icon"
+                    value={formData.reminder}
+                    onChange={(e) => handleChange('reminder', e.target.value)}
+                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                  />
+                </div>
               </div>
             </div>
 

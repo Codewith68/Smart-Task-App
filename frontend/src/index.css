@@ -330,6 +330,48 @@ ul, ol {
   color: var(--text-tertiary);
 }
 
+/* Polished Date/Time Input Wrappers & Icons */
+.input-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-icon-wrapper .input-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--primary-400);
+  pointer-events: none;
+  z-index: 2;
+  transition: color var(--transition-fast);
+}
+
+.input-icon-wrapper:focus-within .input-icon {
+  color: var(--primary-300);
+}
+
+.input-with-icon {
+  padding-left: 38px !important;
+  cursor: pointer;
+}
+
+/* Customized native datetime-local picker indicator icon */
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.8) sepia(1) saturate(5) hue-rotate(200deg);
+  opacity: 0.75;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  background: rgba(99, 102, 241, 0.2);
+  transform: scale(1.1);
+}
+
 .form-error {
   font-size: var(--font-size-xs);
   color: var(--danger);
