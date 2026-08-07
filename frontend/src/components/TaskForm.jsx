@@ -35,7 +35,7 @@ const TaskForm = ({ task, onClose, onSaved }) => {
 
   useEffect(() => {
     const fetchAutocomplete = async () => {
-      if (formData.title.trim().length < 2) {
+      if (formData.title.trim().length < 5) {
         setAiAutocomplete('');
         return;
       }
@@ -51,7 +51,7 @@ const TaskForm = ({ task, onClose, onSaved }) => {
       }
     };
 
-    const debounceTimer = setTimeout(fetchAutocomplete, 500);
+    const debounceTimer = setTimeout(fetchAutocomplete, 1500);
     return () => clearTimeout(debounceTimer);
   }, [formData.title]);
 
