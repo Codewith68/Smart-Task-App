@@ -77,7 +77,10 @@ export default function TasksScreen({ navigation }) {
         />
       </TouchableOpacity>
 
-      <View style={{ flex: 1, paddingRight: 8 }}>
+      <TouchableOpacity
+        style={{ flex: 1, paddingRight: 8 }}
+        onPress={() => navigation.navigate('CreateTask', { task: item, onSaved: fetchTasks })}
+      >
         <Text style={[styles.taskTitle, item.completed && styles.taskTitleCompleted]}>
           {item.title}
         </Text>
@@ -95,11 +98,20 @@ export default function TasksScreen({ navigation }) {
             <Text style={[styles.tagText, { color: '#818cf8' }]}>{item.category}</Text>
           </View>
         </View>
-      </View>
-
-      <TouchableOpacity onPress={() => deleteTask(item._id)} style={styles.deleteBtn}>
-        <Ionicons name="trash-outline" size={18} color="#ef4444" />
       </TouchableOpacity>
+
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('CreateTask', { task: item, onSaved: fetchTasks })}
+          style={[styles.deleteBtn, { marginRight: 4 }]}
+        >
+          <Ionicons name="pencil-outline" size={18} color="#818cf8" />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => deleteTask(item._id)} style={styles.deleteBtn}>
+          <Ionicons name="trash-outline" size={18} color="#ef4444" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 

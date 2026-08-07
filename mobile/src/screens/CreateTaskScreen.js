@@ -16,14 +16,17 @@ const PRIORITIES = ['low', 'medium', 'high', 'urgent'];
 const CATEGORIES = ['General', 'Work', 'Personal', 'Health', 'Finance', 'Education', 'Shopping', 'Travel'];
 
 export default function CreateTaskScreen({ navigation, route }) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState('medium');
-  const [category, setCategory] = useState('General');
+  const taskToEdit = route.params?.task;
+  const isEdit = !!taskToEdit;
+
+  const [title, setTitle] = useState(taskToEdit?.title || '');
+  const [description, setDescription] = useState(taskToEdit?.description || '');
+  const [priority, setPriority] = useState(taskToEdit?.priority || 'medium');
+  const [category, setCategory] = useState(taskToEdit?.category || 'General');
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
 
-  const handleCreate = async () => {
+  const handleSave = async () => {
     if (!title.trim()) {
       Alert.alert('Validation Error', 'Task title is required');
       return;
@@ -31,18 +34,25 @@ export default function CreateTaskScreen({ navigation, route }) {
 
     setLoading(true);
     try {
-      await api.post('/tasks', {
+      const payload = {
         title: title.trim(),
         description: description.trim(),
         priority,
         category,
-      });
+      };
 
-      Alert.alert('Success', 'Task created successfully');
+      if (isEdit) {
+        await api.put(`/tasks/${taskToEdit._id}`, payload);
+        Alert.alert('Success', 'Task updated successfully');
+      } else {
+        await api.post('/tasks', payload);
+        Alert.alert('Success', 'Task created successfully');
+      }
+
       if (route.params?.onSaved) route.params.onSaved();
       navigation.goBack();
     } catch (e) {
-      Alert.alert('Error', 'Failed to create task');
+      Alert.alert('Error', isEdit ? 'Failed to update task' : 'Failed to create task');
     } finally {
       setLoading(false);
     }
@@ -74,7 +84,7 @@ export default function CreateTaskScreen({ navigation, route }) {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#f1f5f9" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>New Task</Text>
+        <Text style={styles.headerTitle}>{isEdit ? 'Edit Task' : 'New Task'}</Text>
         <TouchableOpacity style={styles.aiBtn} onPress={getAiSuggest} disabled={aiLoading}>
           {aiLoading ? (
             <ActivityIndicator size="small" color="#818cf8" />
@@ -141,11 +151,11 @@ export default function CreateTaskScreen({ navigation, route }) {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.submitBtn} onPress={handleCreate} disabled={loading}>
+      <TouchableOpacity style={styles.submitBtn} onPress={handleSave} disabled={loading}>
         {loading ? (
           <ActivityIndicator color="#ffffff" />
         ) : (
-          <Text style={styles.submitText}>Save Task</Text>
+          <Text style={styles.submitText}>{isEdit ? 'Update Task' : 'Save Task'}</Text>
         )}
       </TouchableOpacity>
     </ScrollView>
