@@ -9,7 +9,10 @@ class EmailService {
    * Initialize the email transporter
    */
   init() {
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    if (process.env.RESEND_API_KEY) {
+      console.log('📧 Email service initialized via Resend (HTTPS)');
+      this.useResend = true;
+    } else if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
       this.transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -17,9 +20,9 @@ class EmailService {
           pass: process.env.EMAIL_PASS,
         },
       });
-      console.log('📧 Email service initialized');
+      console.log('📧 Email service initialized via Nodemailer (SMTP)');
     } else {
-      console.log('📧 Email service not configured (missing EMAIL_USER/EMAIL_PASS)');
+      console.log('📧 Email service not configured (missing credentials)');
     }
   }
 
@@ -27,6 +30,34 @@ class EmailService {
    * Send a task reminder email
    */
   async sendReminder(to, taskTitle, taskDescription, dueDate) {
+    if (this.useResend) {
+      const dueDateStr = dueDate ? new Date(dueDate).toLocaleString() : 'No due date';
+      try {
+        const response = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          },
+          body: JSON.stringify({
+            from: 'Smart Task App <onboarding@resend.dev>',
+            to: [to],
+            subject: `⏰ Reminder: ${taskTitle}`,
+            html: `<div style="font-family: sans-serif; padding: 20px;"><h2>⏰ Task Reminder: ${taskTitle}</h2><p>${taskDescription || ''}</p><p>Due: ${dueDateStr}</p></div>`,
+          }),
+        });
+        if (response.ok) {
+          console.log(`📧 Reminder sent via Resend to ${to} for task: "${taskTitle}"`);
+        } else {
+          const errText = await response.text();
+          console.error(`📧 Resend API error:`, errText);
+        }
+      } catch (err) {
+        console.error(`📧 Failed to send via Resend:`, err.message);
+      }
+      return;
+    }
+
     if (!this.transporter) {
       console.log(`📧 [MOCK] Reminder email to ${to}: "${taskTitle}"`);
       return;
